@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
-    "test": "jest"
+    "test": "jest",
+    "negative-check": "tsx scripts/negative-check.ts"
   },
   "jest": {
     "preset": "ts-jest",
@@ -31,6 +32,7 @@
     "@types/node": "^26.6.6",
     "jest": "^30.5.2",
     "ts-jest": "^29.4.15",
+    "tsx": "^4.23.15",
     "typescript": "~5.9.3"
   }
 }
