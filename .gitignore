@@ -1,0 +1,9 @@
+.env
+node_modules
+*.seed
+out
+cache
+broadcast
+dist
+docs/superpowers/
+.superpowers/

@@ -1,0 +1,6 @@
+{
+  "name": "wdk-eip7702-delegation-poc",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@11.1.2"
+}
