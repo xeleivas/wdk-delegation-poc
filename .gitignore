@@ -7,3 +7,9 @@ broadcast
 dist
 docs/superpowers/
 .superpowers/
+
+# Claude Code personal session files
+.claude/daily-update.md
+.claude/*.local.json
+.claude/local/*
+.worktrees/
