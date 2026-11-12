@@ -23,7 +23,8 @@
     "class-validator": "^0.14.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "viem": "^2.57.18"
+    "viem": "^2.57.18",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.2.9",

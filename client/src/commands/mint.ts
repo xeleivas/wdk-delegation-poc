@@ -1,7 +1,7 @@
 import { type Address } from 'viem';
 import { tokenAbi } from '../abi.js';
 import { createDeployerWallet, createPublic } from '../clients.js';
-import { requireAddressEnv } from '../config.js';
+import { config } from '../config/base.config.js';
 import { loadAccount } from '../wallet.js';
 
 export async function mint(amountArg: string | undefined): Promise<void> {
@@ -10,7 +10,7 @@ export async function mint(amountArg: string | undefined): Promise<void> {
   }
   const user = (await (await loadAccount()).getAddress()) as Address;
   const hash = await createDeployerWallet().writeContract({
-    address: requireAddressEnv('MOCK_TOKEN_ADDRESS'),
+    address: config.mockTokenAddress,
     abi: tokenAbi,
     functionName: 'mint',
     args: [user, BigInt(amountArg)],

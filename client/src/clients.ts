@@ -1,20 +1,19 @@
 import { createPublicClient, createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { sepolia } from 'viem/chains';
-import { requireEnv } from './config.js';
+import { config } from './config/base.config.js';
 
 export function createPublic() {
-  return createPublicClient({ chain: sepolia, transport: http(requireEnv('BLOCKCHAIN_RPC_URL')) });
+  return createPublicClient({ chain: sepolia, transport: http(config.rpcUrl) });
 }
 
 export function createDeployerWallet() {
-  const key = requireEnv('DEPLOYER_PRIVATE_KEY');
-  if (!/^0x[0-9a-fA-F]{64}$/.test(key)) {
-    throw new Error('DEPLOYER_PRIVATE_KEY must be a 0x-prefixed 32-byte hex string');
+  if (!config.deployerPrivateKey) {
+    throw new Error('DEPLOYER_PRIVATE_KEY is required for this command');
   }
   return createWalletClient({
-    account: privateKeyToAccount(key as `0x${string}`),
+    account: privateKeyToAccount(config.deployerPrivateKey),
     chain: sepolia,
-    transport: http(requireEnv('BLOCKCHAIN_RPC_URL')),
+    transport: http(config.rpcUrl),
   });
 }

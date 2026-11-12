@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { ConfigService } from '@nestjs/config';
 import { encodeFunctionData, isAddress, parseAbi, type Address } from 'viem';
-import { pocConfig } from '../src/config/poc.config';
+import { baseConfig } from '../src/config/base.config';
 import { TransfersClients } from '../src/transfers/transfers-clients';
 
 try {
@@ -15,7 +15,7 @@ async function main(): Promise<void> {
   if (!userArg || !tokenArg || !isAddress(userArg) || !isAddress(tokenArg)) {
     throw new Error('Usage: negative-check <userAddress> <tokenAddress>');
   }
-  const clients = new TransfersClients(new ConfigService({ poc: pocConfig() }));
+  const clients = new TransfersClients(new ConfigService({ base: baseConfig() }));
   const account = await clients.getExecutorAccount(userArg as Address);
   const approve = encodeFunctionData({
     abi: parseAbi(['function approve(address spender, uint256 amount)']),

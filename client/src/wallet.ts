@@ -4,7 +4,8 @@ import WalletManagerEvm7702Gasless, {
   type Evm7702GaslessWalletConfig,
   type WalletAccountEvm7702Gasless,
 } from '@tetherto/wdk-wallet-evm-7702-gasless';
-import { SEPOLIA_CHAIN_ID, requireAddressEnv, requireEnv } from './config.js';
+import { sepolia } from 'viem/chains';
+import { config } from './config/base.config.js';
 
 const SEED_FILE = resolve(import.meta.dirname, '../wallet.seed');
 
@@ -15,21 +16,18 @@ export function createSeedFile(): void {
   writeFileSync(SEED_FILE, WalletManagerEvm7702Gasless.getRandomSeedPhrase(), { mode: 0o600 });
 }
 
-function buildWalletConfig(): Evm7702GaslessWalletConfig {
-  const sponsorshipPolicyId = process.env.CANDIDE_SPONSORSHIP_POLICY_ID;
-  return {
-    provider: requireEnv('BLOCKCHAIN_RPC_URL'),
-    bundlerUrl: requireEnv('CANDIDE_BUNDLER_URL'),
-    delegationAddress: requireAddressEnv('DELEGATION_ADDRESS'),
-    entryPointVersion: '0.8',
-    chainId: SEPOLIA_CHAIN_ID,
-    isSponsored: true,
-    ...(sponsorshipPolicyId ? { sponsorshipPolicyId } : {}),
-  };
-}
+const walletConfig: Evm7702GaslessWalletConfig = {
+  provider: config.rpcUrl,
+  bundlerUrl: config.bundlerUrl,
+  delegationAddress: config.delegationAddress,
+  entryPointVersion: '0.8',
+  chainId: sepolia.id,
+  isSponsored: true,
+  ...(config.sponsorshipPolicyId ? { sponsorshipPolicyId: config.sponsorshipPolicyId } : {}),
+};
 
 export async function loadAccount(): Promise<WalletAccountEvm7702Gasless> {
   const seed = readFileSync(SEED_FILE, 'utf8');
-  const manager = new WalletManagerEvm7702Gasless(seed, buildWalletConfig());
+  const manager = new WalletManagerEvm7702Gasless(seed, walletConfig);
   return manager.getAccount(0);
 }

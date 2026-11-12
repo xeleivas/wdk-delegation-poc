@@ -9,7 +9,7 @@ import {
   type SmartAccount,
 } from 'viem/account-abstraction';
 import { sepolia } from 'viem/chains';
-import { PocConfig } from '../config/poc.config';
+import { BaseConfig } from '../config/base.config';
 import { createExecutorAccount } from './utils/create-executor-account';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class TransfersClients {
   private readonly executor: PrivateKeyAccount;
 
   constructor(configService: ConfigService) {
-    const config = configService.getOrThrow<PocConfig>('poc');
+    const config = configService.getOrThrow<BaseConfig>('base');
     this.executor = privateKeyToAccount(config.executorPrivateKey);
     this.executorAddress = this.executor.address;
     this.delegationAddress = config.delegationAddress;

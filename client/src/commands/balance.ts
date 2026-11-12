@@ -1,7 +1,7 @@
 import { type Address } from 'viem';
 import { tokenAbi } from '../abi.js';
 import { createPublic } from '../clients.js';
-import { requireAddressEnv } from '../config.js';
+import { config } from '../config/base.config.js';
 import { loadAccount } from '../wallet.js';
 
 export async function balance(): Promise<void> {
@@ -9,7 +9,7 @@ export async function balance(): Promise<void> {
   const publicClient = createPublic();
   const [tokens, eth] = await Promise.all([
     publicClient.readContract({
-      address: requireAddressEnv('MOCK_TOKEN_ADDRESS'),
+      address: config.mockTokenAddress,
       abi: tokenAbi,
       functionName: 'balanceOf',
       args: [address],

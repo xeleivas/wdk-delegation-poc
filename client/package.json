@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@tetherto/wdk-wallet-evm-7702-gasless": "1.0.0-beta.12",
-    "viem": "^2.57.18"
+    "viem": "^2.57.18",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
