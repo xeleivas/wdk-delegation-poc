@@ -27,7 +27,7 @@ forge build
 forge test                       # all tests
 forge test --match-test <name>
 
-# deploy (run from contracts/)
+# deploy (run from contracts/; contract creation on Sepolia needs far more gas than forge estimates, hence the multiplier)
 forge script script/Deploy.s.sol --rpc-url $BLOCKCHAIN_RPC_URL --broadcast --gas-estimate-multiplier 800
 
 # client
@@ -52,22 +52,15 @@ All config comes from env vars in a git-ignored `.env` at the repo root (see `.e
 - **Delegation:** the user EOA delegates via EIP-7702 to `ExecutorDelegation`. One owner-signed gasless UserOp (sent by the WDK client) carries the 7702 authorization and calls `addExecutor(executor)` on the EOA itself.
 - **Validation:** `_validateSignature` accepts the owner, or a registered executor only when `callData` is a single `execute(token, 0, transfer(address,uint256))`. `executeBatch`, other selectors, non-zero value and self-calls are rejected. Executors live in an ERC-7201 namespaced slot.
 - **Revoke:** soft only, an owner-signed UserOp calling `removeExecutor`. Hard revoke (type-4 tx to `address(0)`) is out of scope.
-- **Backend:** builds the UserOp with viem's `viem/account-abstraction` (`toSmartAccount` custom account at the user's address, signed by the executor key), Candide ERC-7677 paymaster, no 7702 authorization attached. WDK cannot be used here because it always signs with the owner key. Only WDK modules and viem are used, no `abstractionkit`.
+- **Backend:** builds the UserOp with viem's `viem/account-abstraction` (`toSmartAccount` custom account at the user's address, signed by the executor key), Candide ERC-7677 paymaster, no 7702 authorization attached. It uses viem instead of WDK because WDK ties the signing key to the sender address.
 - **Endpoints:** `POST /transfers`, `GET /transfers/:userOpHash`, `GET /delegations/:userAddress`.
 
 ## Conventions
 
 - `pnpm` only. TypeScript strict, no `any`, named exports, early returns, small single-purpose functions.
-- Backend: NestJS **11** (CJS) to match the reference stack. v12 is ESM-only and breaks Jest. Use `ConfigService`, never `process.env` in services. DTOs in `dtos/`, one decorated class per file, no barrel index. Never leak internal error details in API responses.
+- Backend: NestJS 11. Use `ConfigService`, never `process.env` in services. DTOs in `dtos/`, one decorated class per file, no barrel index. Never leak internal error details in API responses.
 - Code, comments and file names in English. No commented-out code.
 - Only change what the task requires; mention unrelated issues instead of fixing them.
-- Do not run installs or `pnpm approve-builds` without approval; `pnpm-workspace.yaml` has `allowBuilds` set (esbuild on, `@parcel/watcher` off).
+- Do not run installs without approval.
 - Commits: conventional, single line, no scope, no body, no Co-Authored-By trailer. Do not commit unless asked. Never push.
 - Keep this repo free of references to any real product or company (files, names, commit messages).
-
-## Gotchas
-
-- A security hook blocks writing 64-hex-character literals (they look like private keys). Compute constants such as the ERC-7201 slot in Solidity instead of embedding the literal.
-- Contract creation on Sepolia costs about 7x the gas forge's local simulation estimates (`ExecutorDelegation` needs about 13.6M). Without `--gas-estimate-multiplier 800` the deploy transactions are mined but fail out of gas, and forge still prints addresses with no code behind them. Confirm a deploy with `cast code <address>`.
-- `forge test` after renaming or removing contracts may need `forge clean`.
-- Candide public endpoint is rate-limited per IP; whether it sponsors Sepolia without a policy is one of the open unknowns.
