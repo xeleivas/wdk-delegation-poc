@@ -20,13 +20,15 @@ Design and plan live in `docs/superpowers/specs/` and `docs/superpowers/plans/` 
 ## Commands
 
 ```bash
+source .env
+
 # contracts (run from contracts/)
 forge build
 forge test                       # all tests
 forge test --match-test <name>
 
-# deploy (run from the repo root so forge picks up the root .env)
-forge script contracts/script/Deploy.s.sol --root contracts --rpc-url $BLOCKCHAIN_RPC_URL --broadcast
+# deploy (run from contracts/)
+forge script script/Deploy.s.sol --rpc-url $BLOCKCHAIN_RPC_URL --broadcast --gas-estimate-multiplier 800
 
 # client
 pnpm --filter client start <create-wallet|mint|balance|delegate|revoke> [arg]
@@ -66,6 +68,6 @@ All config comes from env vars in a git-ignored `.env` at the repo root (see `.e
 ## Gotchas
 
 - A security hook blocks writing 64-hex-character literals (they look like private keys). Compute constants such as the ERC-7201 slot in Solidity instead of embedding the literal.
-- `forge` loads `.env` from the current directory, so run deploys from the repo root with `--root contracts`.
+- Contract creation on Sepolia costs about 7x the gas forge's local simulation estimates (`ExecutorDelegation` needs about 13.6M). Without `--gas-estimate-multiplier 800` the deploy transactions are mined but fail out of gas, and forge still prints addresses with no code behind them. Confirm a deploy with `cast code <address>`.
 - `forge test` after renaming or removing contracts may need `forge clean`.
 - Candide public endpoint is rate-limited per IP; whether it sponsors Sepolia without a policy is one of the open unknowns.
